@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
+const shajs = require("sha.js");
 
 const app = express();
 
@@ -20,9 +20,6 @@ const userSchema = new mongoose.Schema({
     password: String
 });
 
-
-userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ["password"]});
-
 const User = mongoose.model("User", userSchema);
 
 app.get("/", function (req, res) {
@@ -35,29 +32,18 @@ app.get("/login", function (req, res) {
 
 app.post("/login", function (req, res) {
     const username = req.body.username;
-    const password = req.body.password;
+    const password = shajs('sha256').update('42').digest('hex');
 
-    const newUser = new User({
-        email: username,
-        password: password
-    });
-
-    User.findOne({email: username}, function(err, user){
+    User.findOne({email: username, password: password}, function(err, user){
         if(err){
             console.log(err);
+        }
+
+        if(user != null){
+            res.render("secrets");
+        } else {
             res.render("login");
         }
-        else if(user != null){
-            if(user.password === password){
-                res.render("secrets");
-            } else {
-                res.render("login");
-            }
-        }
-        else{
-            res.render("login");
-        }
-        
     });
 });
 
@@ -69,7 +55,7 @@ app.get("/register", function (req, res) {
 app.post("/register", function (req, res) {
 
     const username = req.body.username;
-    const password = req.body.password;
+    const password = shajs('sha256').update('42').digest('hex');
 
     const newUser = new User({
         email: username,
