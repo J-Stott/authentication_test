@@ -75,10 +75,12 @@ app.post("/register", function (req, res) {
                     res.render("secrets");
                 } else {
                     console.log(err);
+                    res.redirect("/register");
                 }
             });
         } else {
             console.log(err);
+            res.redirect("/login");
         }
     });
 });
