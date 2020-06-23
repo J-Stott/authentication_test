@@ -148,6 +148,7 @@ app.get("/submit", function(req, res){
     }
 });
 
+//adds a secret
 app.post("/submit", function(req, res){
     const secret = req.body.secret;
     const id = req.user.id;
